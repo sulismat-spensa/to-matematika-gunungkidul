@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TO I Kabupaten Gunungkidul - Matematika SMP Online</title>
+<style>
+:root{--blue:#1459a8;--blue2:#0b3970;--bg:#f3f6fb;--ink:#182230;--muted:#64748b;--green:#16834a;--red:#c62828}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+header{background:linear-gradient(120deg,var(--blue2),var(--blue));color:#fff;padding:24px 16px}
+.wrap{max-width:1100px;margin:auto}header h1{margin:0;font-size:clamp(1.35rem,3vw,2rem)}header p{margin:6px 0 0;opacity:.9}
+main{max-width:1100px;margin:22px auto;padding:0 14px}.panel{background:#fff;border-radius:16px;padding:20px;box-shadow:0 4px 18px #15294b12;margin-bottom:18px}
+.fields{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:14px}label{display:block;font-weight:650;margin-bottom:6px}input[type=text]{width:100%;padding:11px 12px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.timer{font-weight:800;font-size:1.2rem;color:var(--blue);background:#eaf2ff;padding:8px 14px;border-radius:10px}
+.progress{height:8px;background:#e2e8f0;border-radius:20px;overflow:hidden;margin:14px 0}.progress div{height:100%;width:0;background:var(--blue);transition:width .2s}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}
+.qmeta{color:var(--muted);font-size:.92rem;margin-bottom:8px}.question{font-size:1.12rem;font-weight:650;margin:0 0 18px;white-space:pre-line}
+.options{display:grid;gap:10px}.option{display:flex;gap:10px;align-items:flex-start;border:1px solid #d5deea;padding:12px;border-radius:10px;cursor:pointer;transition:.15s}.option:hover{border-color:var(--blue);background:#f7faff}.option.selected{border-color:var(--blue);background:#eaf2ff}.option input{margin-top:5px;accent-color:var(--blue)}
+.btns{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px}.btn{border:0;border-radius:10px;padding:11px 16px;font:inherit;font-weight:700;cursor:pointer}.primary{background:var(--blue);color:#fff}.primary:hover{background:var(--blue2)}.secondary{background:#e8eef6;color:#18314f}.danger{background:#fee2e2;color:#991b1b}
+.navgrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}.navnum{padding:9px 0;border:1px solid #cbd5e1;border-radius:8px;background:#fff;font-weight:700;cursor:pointer}.navnum.done{background:#dcfce7;border-color:#86efac}.navnum.current{outline:3px solid #93c5fd;border-color:var(--blue)}.legend{font-size:.82rem;color:var(--muted);margin:12px 0}
+.small{color:var(--muted);font-size:.92rem}.hidden{display:none!important}.resultscore{font-size:2.4rem;font-weight:850;color:var(--blue)}.review-item{padding:14px 0;border-bottom:1px solid #e2e8f0}.correct{color:var(--green);font-weight:750}.wrong{color:var(--red);font-weight:750}
+footer{text-align:center;color:var(--muted);padding:20px;font-size:.9rem}
+@media(max-width:800px){.layout{grid-template-columns:1fr}.sidebar{order:-1}.navgrid{grid-template-columns:repeat(10,1fr)}}
+@media(max-width:480px){.navgrid{grid-template-columns:repeat(6,1fr)}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+<h1>TO I Kabupaten Gunungkidul</h1>
+<p>Latihan Matematika SMP/MTs • Kelas IX • Paket 30 Soal</p>
+</div></header>
+<main>
+<section class="panel" id="identity">
+<h2 style="margin-top:0">Identitas Peserta</h2>
+<div class="fields">
+<div><label for="studentName">Nama lengkap</label><input id="studentName" type="text" placeholder="Masukkan nama siswa" autocomplete="name"></div>
+<div><label for="studentNis">NIS</label><input id="studentNis" type="text" inputmode="numeric" placeholder="Masukkan NIS siswa"></div>
+<div><label for="studentClass">Kelas / sekolah</label><input id="studentClass" type="text" placeholder="Contoh: IX A / SMP ..."></div>
+</div>
+<p class="small">Waktu pengerjaan 90 menit. Pilih satu jawaban paling tepat untuk setiap soal. Hasil akan ditampilkan setelah jawaban dikumpulkan.</p>
+<button class="btn primary" id="startBtn">Mulai Mengerjakan</button>
+</section>
+
+<section id="exam" class="hidden">
+<div class="panel">
+<div class="topbar"><div><strong id="studentLabel">Peserta</strong><div class="small">Pilih jawaban, lalu gunakan tombol navigasi.</div></div><div class="timer" id="timer">90:00</div></div>
+<div class="progress"><div id="progressFill"></div></div>
+<div class="small" id="progressText">Terjawab 0 dari 30 soal</div>
+</div>
+<div class="layout">
+<section class="panel">
+<div class="qmeta" id="qmeta">Soal 1 dari 30</div>
+<p class="question" id="questionText"></p>
+<div class="options" id="options"></div>
+<div class="btns">
+<button class="btn secondary" id="prevBtn">← Sebelumnya</button>
+<button class="btn primary" id="nextBtn">Berikutnya →</button>
+<button class="btn danger" id="finishBtn">Selesai & Nilai</button>
+</div>
+</section>
+<aside class="panel sidebar">
+<h3 style="margin-top:0">Navigasi Soal</h3>
+<div class="navgrid" id="navgrid"></div>
+<div class="legend">Hijau = sudah dijawab • Bingkai biru = soal aktif</div>
+<p class="small">Pastikan semua jawaban diperiksa sebelum dikumpulkan.</p>
+</aside>
+</div>
+</section>
+
+<section id="results" class="hidden">
+<div class="panel">
+<h2 style="margin-top:0">Hasil Pengerjaan</h2>
+<div id="resultName"></div>
+<div class="resultscore" id="scoreText">0 / 100</div>
+<p id="resultSummary"></p><p id="saveStatus" class="small" role="status">Menyiapkan penyimpanan nilai...</p>
+<div class="btns"><button class="btn primary" id="reviewBtn">Lihat Pembahasan</button><button class="btn secondary" id="printBtn">Cetak Hasil</button></div>
+</div>
+<div class="panel hidden" id="reviewPanel"><h2>Pembahasan dan Kunci Jawaban</h2><div id="reviewList"></div></div>
+</section>
+</main>
+<footer>Latihan mandiri • Paket latihan orisinal, bukan soal resmi pemerintah daerah.</footer>
+
+<script>
+const questions = [
+{q:"Suhu di sebuah daerah pegunungan pada pukul 04.00 adalah −3°C. Pada siang hari, suhu naik 11°C, kemudian pada malam hari turun 7°C. Suhu pada malam hari adalah ....",o:["−1°C","1°C","4°C","15°C"],a:0,e:"−3 + 11 − 7 = 1°C. Jadi jawaban yang benar adalah B (1°C).",fix:true},
+{q:"Bentuk sederhana dari (2⁵ × 2³) ÷ 2⁴ adalah ....",o:["8","12","16","32"],a:2,e:"Gunakan aturan pangkat: 2⁵ × 2³ ÷ 2⁴ = 2⁽⁵⁺³⁻⁴⁾ = 2⁴ = 16."},
+{q:"Bentuk sederhana dari √75 − √12 + √27 adalah ....",o:["4√3","5√3","6√3","7√3"],a:2,e:"√75 = 5√3, √12 = 2√3, dan √27 = 3√3. Hasilnya 5√3 − 2√3 + 3√3 = 6√3."},
+{q:"Sebuah toko memberikan diskon 20% untuk sebuah tas. Setelah diskon, harga tas menjadi Rp240.000,00. Harga tas sebelum diskon adalah ....",o:["Rp280.000,00","Rp288.000,00","Rp300.000,00","Rp320.000,00"],a:2,e:"Rp240.000,00 adalah 80% harga awal. Harga awal = 240.000 ÷ 0,8 = Rp300.000,00."},
+{q:"Seorang pedagang membeli 40 buku dengan harga Rp8.000,00 per buku. Sebanyak 8 buku rusak dan tidak dapat dijual. Agar memperoleh keuntungan 20% dari seluruh modal, harga jual setiap buku yang tersisa harus sebesar ....",o:["Rp10.000,00","Rp10.500,00","Rp11.000,00","Rp12.000,00"],a:3,e:"Modal = 40 × Rp8.000 = Rp320.000. Target pendapatan = 120% × Rp320.000 = Rp384.000. Buku terjual = 40 − 8 = 32. Harga per buku = Rp384.000 ÷ 32 = Rp12.000,00."},
+{q:"Penyelesaian dari persamaan 3(2x − 4) = 2x + 12 adalah ....",o:["x = 4","x = 5","x = 6","x = 8"],a:2,e:"6x − 12 = 2x + 12, sehingga 4x = 24 dan x = 6."},
+{q:"Diketahui sistem persamaan 2x + y = 13 dan x − y = 2. Nilai 3x + 2y adalah ....",o:["17","19","21","23"],a:3,e:"Dari x − y = 2 diperoleh y = x − 2. Substitusi: 2x + x − 2 = 13, maka x = 5 dan y = 3. Jadi 3x + 2y = 21. Jawaban yang benar C.",fix:true},
+{q:"Sebuah persegi panjang memiliki panjang (3x + 2) cm dan lebar (x + 4) cm. Jika kelilingnya 44 cm, luas persegi panjang tersebut adalah ....",o:["104 cm²","108 cm²","112 cm²","120 cm²"],a:2,e:"Keliling 44 berarti panjang + lebar = 22. Maka 3x + 2 + x + 4 = 22, sehingga x = 4. Panjang 14 cm dan lebar 8 cm, jadi luas = 112 cm²."},
+{q:"Diketahui fungsi f(x) = 2x² − 3x + 1. Nilai f(−2) adalah ....",o:["3","7","11","15"],a:3,e:"f(−2) = 2(−2)² − 3(−2) + 1 = 8 + 6 + 1 = 15."},
+{q:"Tarif sebuah layanan kendaraan terdiri atas biaya awal Rp5.000,00 dan biaya perjalanan Rp3.000,00 per kilometer. Jika seseorang membayar Rp32.000,00, jarak perjalanan yang ditempuh adalah ....",o:["7 km","8 km","9 km","10 km"],a:1,e:"Biaya perjalanan = Rp32.000 − Rp5.000 = Rp27.000. Jarak = 27.000 ÷ 3.000 = 9 km. Jawaban yang benar C.",fix:true},
+{q:"Perbandingan banyak siswa laki-laki dan perempuan di suatu kelas adalah 3 : 5. Jika jumlah seluruh siswa 32 orang, selisih banyak siswa perempuan dan laki-laki adalah ....",o:["6 orang","8 orang","10 orang","12 orang"],a:1,e:"Jumlah bagian = 8, satu bagian = 32 ÷ 8 = 4. Laki-laki 12 dan perempuan 20, selisihnya 8 orang."},
+{q:"Sebuah pekerjaan dapat diselesaikan oleh 12 pekerja dalam 15 hari. Jika kemampuan setiap pekerja sama dan pekerjaan harus selesai dalam 9 hari, banyak pekerja tambahan yang diperlukan adalah ....",o:["4 orang","6 orang","8 orang","10 orang"],a:2,e:"Total beban kerja = 12 × 15 = 180 hari-orang. Pekerja yang dibutuhkan = 180 ÷ 9 = 20 orang. Tambahan = 20 − 12 = 8 orang."},
+{q:"Perhatikan barisan 5, 9, 13, 17, .... Jumlah 20 suku pertama barisan tersebut adalah ....",o:["800","820","840","860"],a:3,e:"a₁ = 5, beda = 4, a₂₀ = 5 + 19 × 4 = 81. Jumlah = 20/2 × (5 + 81) = 860."},
+{q:"Dalam sebuah kotak terdapat 5 bola merah, 3 bola biru, dan 2 bola kuning. Satu bola diambil secara acak. Peluang terambil bola yang bukan berwarna merah adalah ....",o:["1/5","3/10","1/2","3/5"],a:2,e:"Jumlah bola = 10. Bukan merah = 3 + 2 = 5. Peluang = 5/10 = 1/2."},
+{q:"Dua buah dadu bersisi enam dilempar bersamaan. Peluang munculnya jumlah mata dadu 8 adalah ....",o:["5/36","1/6","7/36","1/4"],a:0,e:"Pasangan yang jumlahnya 8: (2,6), (3,5), (4,4), (5,3), (6,2), yaitu 5 dari 36 kemungkinan. Peluang = 5/36."},
+{q:"Dua garis sejajar dipotong oleh sebuah garis transversal. Salah satu sudut yang terbentuk besarnya 65°. Besar sudut tumpul yang berpasangan dengannya adalah ....",o:["65°","105°","115°","125°"],a:2,e:"Sudut berpelurus berjumlah 180°. Jadi 180° − 65° = 115°."},
+{q:"Sebuah tangga sepanjang 10 meter disandarkan pada dinding. Ujung atas tangga mencapai ketinggian 8 meter dari tanah. Jarak kaki tangga dari dinding adalah ....",o:["4 meter","5 meter","6 meter","8 meter"],a:2,e:"Dengan Teorema Pythagoras, jarak = √(10² − 8²) = √36 = 6 meter."},
+{q:"Sebuah segitiga memiliki panjang sisi 6 cm, 8 cm, dan 10 cm. Segitiga lain sebangun dengannya dan memiliki sisi terpendek 9 cm. Keliling segitiga kedua adalah ....",o:["30 cm","32 cm","36 cm","40 cm"],a:2,e:"Faktor skala = 9/6 = 1,5. Keliling awal = 24 cm, sehingga keliling baru = 24 × 1,5 = 36 cm."},
+{q:"Sebuah taman berbentuk lingkaran memiliki diameter 28 meter. Di sekeliling taman akan dipasang pagar, kecuali bagian sepanjang 4 meter untuk pintu masuk. Jika π = 22/7, panjang pagar yang diperlukan adalah ....",o:["80 meter","84 meter","88 meter","92 meter"],a:1,e:"Keliling = πd = 22/7 × 28 = 88 meter. Panjang pagar = 88 − 4 = 84 meter."},
+{q:"Sebuah tabung memiliki jari-jari 7 cm dan tinggi 10 cm. Volume tabung tersebut, dengan π = 22/7, adalah ....",o:["1.320 cm³","1.430 cm³","1.540 cm³","1.760 cm³"],a:2,e:"V = πr²t = 22/7 × 7² × 10 = 1.540 cm³."},
+{q:"Titik A(3, −2) ditranslasikan oleh T = (−5, 4). Koordinat bayangan titik A adalah ....",o:["(−2, 2)","(2, −2)","(−2, −6)","(8, 2)"],a:0,e:"Tambahkan komponen translasi: (3 − 5, −2 + 4) = (−2, 2)."},
+{q:"Titik P(4, −3) dicerminkan terhadap sumbu-Y. Koordinat bayangannya adalah ....",o:["(4, 3)","(−4, −3)","(−4, 3)","(3, −4)"],a:1,e:"Pencerminan terhadap sumbu-Y mengubah (x, y) menjadi (−x, y), sehingga bayangannya (−4, −3)."},
+{q:"Titik B(2, 5) dirotasikan sebesar 90° berlawanan arah jarum jam dengan pusat O(0, 0). Koordinat bayangan titik B adalah ....",o:["(5, −2)","(−5, 2)","(−2, −5)","(2, −5)"],a:1,e:"Rotasi 90° berlawanan arah jarum jam mengubah (x, y) menjadi (−y, x). Jadi (2, 5) menjadi (−5, 2)."},
+{q:"Sebuah kerucut memiliki jari-jari alas 6 cm dan tinggi 8 cm. Volume kerucut tersebut adalah ....",o:["48π cm³","72π cm³","96π cm³","288π cm³"],a:1,e:"V = 1/3 × π × 6² × 8 = 96π cm³. Jawaban yang benar C.",fix:true},
+{q:"Sebuah bak air berbentuk balok berukuran panjang 80 cm, lebar 50 cm, dan tinggi 60 cm. Bak diisi air hingga 3/4 bagian kapasitasnya. Volume air di dalam bak adalah ....",o:["120 liter","150 liter","180 liter","240 liter"],a:2,e:"Volume bak = 80 × 50 × 60 = 240.000 cm³ = 240 liter. Tiga perempatnya = 180 liter."},
+{q:"Nilai ulangan matematika 7 siswa adalah 6, 7, 8, 8, 9, 7, 10. Rata-rata nilai tersebut adalah ....",o:["7","7,5","55/7","8"],a:2,e:"Jumlah nilai = 55. Rata-rata = 55/7 ≈ 7,86."},
+{q:"Rata-rata nilai 8 siswa adalah 75. Setelah nilai seorang siswa ditambahkan, rata-rata 9 siswa menjadi 77. Nilai siswa yang baru ditambahkan adalah ....",o:["85","89","91","93"],a:2,e:"Jumlah nilai awal = 8 × 75 = 600. Jumlah baru = 9 × 77 = 693. Nilai tambahan = 693 − 600 = 93. Jawaban yang benar D.",fix:true},
+{q:"Sebuah toko menjual sepatu dengan harga Rp400.000,00. Pada hari pertama, harga dinaikkan 20%, kemudian pada hari berikutnya harga tersebut didiskon 20%. Harga sepatu setelah kedua perubahan tersebut adalah ....",o:["Rp360.000,00","Rp384.000,00","Rp400.000,00","Rp416.000,00"],a:1,e:"Setelah naik 20%: Rp400.000 × 1,2 = Rp480.000. Setelah diskon 20%: Rp480.000 × 0,8 = Rp384.000."},
+{q:"Sebuah halaman sekolah berbentuk persegi panjang berukuran 20 m × 14 m. Di bagian dalam halaman dibuat jalan selebar 1 m yang mengelilingi halaman. Luas bagian tengah yang tidak menjadi jalan adalah ....",o:["180 m²","204 m²","216 m²","234 m²"],a:0,e:"Jalan selebar 1 m di tiap sisi membuat ukuran bagian tengah 18 m × 12 m. Luas = 216 m². Jawaban yang benar C.",fix:true},
+{q:"Sebuah tangki berbentuk tabung memiliki jari-jari 35 cm dan tinggi 100 cm. Tangki terisi air sebanyak 60% dari kapasitasnya. Air tersebut akan dipindahkan ke beberapa wadah kecil yang masing-masing berkapasitas 5 liter. Banyak wadah yang dapat diisi penuh adalah .... (Gunakan π = 22/7.)",o:["42 wadah","44 wadah","46 wadah","48 wadah"],a:1,e:"Volume tangki = 22/7 × 35² × 100 = 385.000 cm³ = 385 liter. Air = 60% × 385 = 231 liter. Wadah penuh = 231 ÷ 5 = 46 wadah penuh (tersisa 1 liter). Jawaban yang benar C.",fix:true}
+];
+
+questions[0].a=1; 
+questions[6].a=2; 
+questions[9].a=2; 
+questions[23].a=2; 
+questions[26].a=3; 
+questions[28].a=2; 
+questions[29].a=2; 
+
+let current=0, answers=Array(questions.length).fill(null), started=false, finished=false, remaining=90*60, timerHandle=null;
+const $=id=>document.getElementById(id);
+function startExam(){
+ const name=$('studentName').value.trim();
+ if(!name){alert('Silakan isi nama lengkap terlebih dahulu.');$('studentName').focus();return;}
+ if(started)return;
+ started=true;$('identity').classList.add('hidden');$('exam').classList.remove('hidden');
+ const nis=$('studentNis').value.trim();
+ $('studentLabel').textContent=name+(nis?' • NIS: '+nis:'')+($('studentClass').value.trim()?' • '+$('studentClass').value.trim():'');
+ buildNav();renderQuestion();updateProgress();
+ timerHandle=setInterval(()=>{if(finished)return;remaining--;updateTimer();if(remaining<=0){clearInterval(timerHandle);submitExam(true)}},1000);
+}
+function updateTimer(){const m=Math.floor(remaining/60),s=remaining%60;$('timer').textContent=String(m).padStart(2,'0')+':'+String(s).padStart(2,'0');if(remaining<=300)$('timer').style.color='#c62828'}
+function buildNav(){$('navgrid').innerHTML='';questions.forEach((_,i)=>{const b=document.createElement('button');b.className='navnum';b.textContent=i+1;b.id='nav'+i;b.addEventListener('click',()=>{current=i;renderQuestion()});$('navgrid').appendChild(b)})}
+function renderQuestion(){
+ const item=questions[current];$('qmeta').textContent=`Soal ${current+1} dari ${questions.length}`;$('questionText').textContent=item.q;
+ $('options').innerHTML='';
+ item.o.forEach((opt,i)=>{const label=document.createElement('label');label.className='option'+(answers[current]===i?' selected':'');
+ const radio=document.createElement('input');radio.type='radio';radio.name='answer';radio.checked=answers[current]===i;
+ radio.addEventListener('change',()=>{answers[current]=i;renderQuestion();updateProgress()});
+ const span=document.createElement('span');span.textContent=String.fromCharCode(65+i)+'. '+opt;
+ label.append(radio,span);$('options').appendChild(label)});
+ $('prevBtn').disabled=current===0;$('prevBtn').style.opacity=current===0?.45:1;
+ $('nextBtn').textContent=current===questions.length-1?'Kembali ke soal pertama':'Berikutnya →';
+ questions.forEach((_,i)=>{const b=$('nav'+i);b.classList.toggle('done',answers[i]!==null);b.classList.toggle('current',i===current)});
+}
+function updateProgress(){const n=answers.filter(a=>a!==null).length;$('progressText').textContent=`Terjawab ${n} dari ${questions.length} soal`;$('progressFill').style.width=(n/questions.length*100)+'%'}
+$('startBtn').addEventListener('click',startExam);
+$('prevBtn').addEventListener('click',()=>{if(current>0){current--;renderQuestion()}});
+$('nextBtn').addEventListener('click',()=>{current=current===questions.length-1?0:current+1;renderQuestion()});
+$('finishBtn').addEventListener('click',()=>submitExam(false));
+function submitExam(auto=false){
+ if(finished)return;
+ const unanswered=answers.filter(a=>a===null).length;
+ if(!auto&&!confirm(unanswered?`Masih ada ${unanswered} soal yang belum dijawab. Yakin ingin mengumpulkan?`:'Yakin ingin mengumpulkan jawaban?'))return;
+ finished=true;clearInterval(timerHandle);
+ let correct=0;questions.forEach((q,i)=>{if(answers[i]===q.a)correct++});
+ const score=Math.round(correct/questions.length*100);
+ $('exam').classList.add('hidden');$('results').classList.remove('hidden');
+ $('resultName').textContent='Nama: '+$('studentName').value.trim()+' • NIS: '+($('studentNis').value.trim()||'—')+' • Kelas/sekolah: '+($('studentClass').value.trim()||'—');
+ $('scoreText').textContent=`${score} / 100`;
+ const wrong=answers.filter((a,i)=>a!==null&&a!==questions[i].a).length;
+ $('resultSummary').textContent=`Jawaban benar: ${correct} • Salah: ${wrong} • Tidak dijawab: ${unanswered}. ${auto?'Waktu habis; jawaban dikumpulkan otomatis.':'Pengerjaan telah dikumpulkan.'}`;
+ saveResultToSpreadsheet({
+   nama:$('studentName').value.trim(), nis:$('studentNis').value.trim(),
+   kelas:$('studentClass').value.trim(), skor:score, benar:correct, salah:wrong,
+   kosong:unanswered, jawaban:answers.map(a=>a===null?'':String.fromCharCode(65+a)),
+   kunci:questions.map(q=>String.fromCharCode(65+q.a)),
+   durasiDetik:(90*60)-remaining, statusWaktuHabis:auto
+ });
+ $('reviewList').innerHTML='';
+ questions.forEach((q,i)=>{const div=document.createElement('div');div.className='review-item';const chosen=answers[i]===null?'Tidak dijawab':String.fromCharCode(65+answers[i])+'. '+q.o[answers[i]];const correctText=String.fromCharCode(65+q.a)+'. '+q.o[q.a];const ok=answers[i]===q.a;
+ const title=document.createElement('strong');title.textContent=`Nomor ${i+1}: `;const status=document.createElement('span');status.className=ok?'correct':'wrong';status.textContent=ok?'Benar': 'Belum tepat';
+ const p1=document.createElement('p');p1.textContent=q.q;
+ const p2=document.createElement('p');p2.textContent='Jawaban Anda: '+chosen;
+ const p3=document.createElement('p');p3.textContent='Kunci: '+correctText;
+ const p4=document.createElement('p');p4.textContent='Pembahasan: '+q.e;
+ div.append(title,status,p1,p2,p3,p4);$('reviewList').appendChild(div)});
+}
+
+/* ============================================================
+   PENGATURAN PENYIMPANAN NILAI (versi GitHub)
+   Tempel alamat Web App Apps Script (berakhiran /exec) hasil
+   Deploy Code.gs di antara tanda kutip pada baris API_URL:
+   const API_URL = "https://script.google.com/macros/s/.../exec";
+   Alamat juga bisa diberikan lewat alamat halaman: ?api=ALAMAT
+   ============================================================ */
+const API_URL = "https://script.google.com/macros/s/AKfycbzZD1LAAAiqMqDnnOuvO2s2hb8iyMftzqcUgItrj-ZELUItCIvz38jAA3lYSokmxmcM/exec";
+
+function saveResultToSpreadsheet(payload){
+ const status=$('saveStatus');
+ status.textContent='Menyimpan nilai ke Google Spreadsheet...';
+ // Mode lama: halaman ini dibuka dari dalam Google Apps Script.
+ if(typeof google!=='undefined' && google.script && google.script.run){
+   google.script.run.withSuccessHandler(res=>{
+     status.textContent=res&&res.success?'Nilai berhasil tersimpan di Spreadsheet guru.':'Nilai belum dapat dipastikan tersimpan.';
+     status.style.color=res&&res.success?'#16834a':'#c62828';
+   }).withFailureHandler(err=>{
+     status.textContent='Gagal menyimpan: '+(err&&err.message?err.message:'kesalahan koneksi.');
+     status.style.color='#c62828';
+   }).submitResult(payload);
+   return;
+ }
+ // Mode GitHub: kirim nilai ke API Apps Script (JSONP).
+ const api=(new URLSearchParams(location.search).get('api')||API_URL||'').trim();
+ if(!api){
+   status.textContent='Penyimpanan online belum diatur: alamat API belum dipasang pada file ini. Nilai tampil di layar, tetapi belum terkirim ke Spreadsheet guru.';
+   status.style.color='#c62828';
+   return;
+ }
+ const cbName='__toSaveCb'+Date.now();
+ let selesai=false;
+ const script=document.createElement('script');
+ const batas=setTimeout(()=>{
+   if(selesai)return; selesai=true; bersih();
+   status.textContent='Penyimpanan belum terkonfirmasi karena koneksi lambat. Periksa Spreadsheet guru sebelum mengulang pengiriman.';
+   status.style.color='#c62828';
+ },20000);
+ function bersih(){
+   try{delete window[cbName];}catch(e){window[cbName]=undefined;}
+   if(script.parentNode)script.parentNode.removeChild(script);
+ }
+ window[cbName]=function(res){
+   if(selesai)return; selesai=true; clearTimeout(batas); bersih();
+   status.textContent=res&&res.success?'Nilai berhasil tersimpan di Spreadsheet guru.':'Nilai belum dapat dipastikan tersimpan.';
+   status.style.color=res&&res.success?'#16834a':'#c62828';
+ };
+ script.onerror=function(){
+   if(selesai)return; selesai=true; clearTimeout(batas); bersih();
+   status.textContent='Gagal menyimpan: kesalahan koneksi.';
+   status.style.color='#c62828';
+ };
+ script.src=api+(api.indexOf('?')>=0?'&':'?')+'action=submit&callback='+cbName+'&payload='+encodeURIComponent(JSON.stringify(payload));
+ document.body.appendChild(script);
+}
+
+$('reviewBtn').addEventListener('click',()=>{$('reviewPanel').classList.toggle('hidden');$('reviewBtn').textContent=$('reviewPanel').classList.contains('hidden')?'Lihat Pembahasan':'Tutup Pembahasan';if(!$('reviewPanel').classList.contains('hidden'))$('reviewPanel').scrollIntoView({behavior:'smooth'})});
+$('printBtn').addEventListener('click',()=>window.print());
+</script>
+</body></html>
